@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+  <title>Simple Club Penguin</title>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Images
+    const backgroundImg = new Image();
+    const penguinImg = new Image();
+    const heatmapImg = new Image();
+
+    // Set image sources (replace with actual file paths)
+    backgroundImg.src = "BoxCritters.webp";
+    penguinImg.src = "penguin.png";
+    heatmapImg.src = "treasure.png";
+
+    // Penguin object
+    const penguin = {
+      x: canvas.width / 2, // Start at the center of the canvas
+      y: canvas.height / 2,
+      width: 50,
+      height: 50,
+      speed: 3, // Decreased speed
+      targetX: canvas.width / 2,
+      targetY: canvas.height / 2,
+    };
+
+    // Handle mouse click
+    canvas.addEventListener("click", function (e) {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      // Check if the clicked position is within the non-transparent area of the heatmap
+      const pixel = ctx.getImageData(clickX, clickY, 1, 1).data;
+
+      if (pixel[3] !== 0) { // Check the alpha value to determine transparency
+        // Set target to the clicked position
+        penguin.targetX = clickX;
+        penguin.targetY = clickY;
+      }
+    });
+
+    // Update and render loop
+    function gameLoop() {
+      update();
+      render();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Update the game logic
+    function update() {
+      // Move towards the target
+      const deltaX = penguin.targetX - penguin.x;
+      const deltaY = penguin.targetY - penguin.y;
+      const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
+
+      if (distance > penguin.speed) {
+        const ratio = penguin.speed / distance;
+        penguin.x += deltaX * ratio;
+        penguin.y += deltaY * ratio;
+      } else {
+        // Arrived at the target
+        penguin.x = penguin.targetX;
+        penguin.y = penguin.targetY;
+      }
+    }
+
+    // Render the game
+    function render() {
+      // Draw background
+      ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+
+      // Draw heatmap (invisible to the player)
+      ctx.globalAlpha = 0;
+      ctx.drawImage(heatmapImg, 0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = 1;
+
+      // Draw penguin
+      ctx.drawImage(penguinImg, penguin.x - penguin.width / 2, penguin.y - penguin.height / 2, penguin.width, penguin.height);
+    }
+
+    // Start the game loop
+    gameLoop();
+  });
+</script>
+
+</body>
+</html>
