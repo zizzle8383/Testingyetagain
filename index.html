@@ -47,9 +47,6 @@
       targetY: canvas.height / 2,
     };
 
-    // Color of the non-transparent part in the heatmap
-    const nonTransparentColor = [0, 204, 0, 255]; // RGBA values for #00cc00
-
     // Handle mouse click
     canvas.addEventListener("click", function (e) {
       const rect = canvas.getBoundingClientRect();
@@ -60,10 +57,10 @@
       const pixel = ctx.getImageData(clickX, clickY, 1, 1).data;
 
       // Check if the pixel color matches the non-transparent color
-      const isNonTransparentColor = pixel[0] === nonTransparentColor[0] &&
-                                     pixel[1] === nonTransparentColor[1] &&
-                                     pixel[2] === nonTransparentColor[2] &&
-                                     pixel[3] === nonTransparentColor[3];
+      const isNonTransparentColor = pixel[0] === 0 &&
+                                     pixel[1] === 204 &&
+                                     pixel[2] === 0 &&
+                                     pixel[3] === 255;
 
       if (isNonTransparentColor) {
         // Set target to the clicked position
