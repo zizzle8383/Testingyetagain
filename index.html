@@ -26,13 +26,15 @@
 
     // Images
     const backgroundImg = new Image();
+    const foregroundImg = new Image();
     const penguinImg = new Image();
     const heatmapImg = new Image();
 
     // Set image sources (replace with actual file paths)
     backgroundImg.src = "BoxCritters.webp";
+    foregroundImg.src = "foreground.png";
     penguinImg.src = "penguin.webp";
-    heatmapImg.src = "treasure.png";
+    heatmapImg.src = "towntm.png";
 
     // Penguin object
     const penguin = {
@@ -45,6 +47,9 @@
       targetY: canvas.height / 2,
     };
 
+    // Color of the non-transparent part in the heatmap
+    const nonTransparentColor = [0, 204, 0, 255]; // RGBA values for #00cc00
+
     // Handle mouse click
     canvas.addEventListener("click", function (e) {
       const rect = canvas.getBoundingClientRect();
@@ -54,7 +59,13 @@
       // Check if the clicked position is within the non-transparent area of the heatmap
       const pixel = ctx.getImageData(clickX, clickY, 1, 1).data;
 
-      if (pixel[3] !== 0) { // Check the alpha value to determine transparency
+      // Check if the pixel color matches the non-transparent color
+      const isNonTransparentColor = pixel[0] === nonTransparentColor[0] &&
+                                     pixel[1] === nonTransparentColor[1] &&
+                                     pixel[2] === nonTransparentColor[2] &&
+                                     pixel[3] === nonTransparentColor[3];
+
+      if (isNonTransparentColor) {
         // Set target to the clicked position
         penguin.targetX = clickX;
         penguin.targetY = clickY;
@@ -98,6 +109,9 @@
 
       // Draw penguin
       ctx.drawImage(penguinImg, penguin.x - penguin.width / 2, penguin.y - penguin.height / 2, penguin.width, penguin.height);
+
+      // Draw foreground
+      ctx.drawImage(foregroundImg, 0, 0, canvas.width, canvas.height);
     }
 
     // Start the game loop
